@@ -127,7 +127,7 @@ export default function SignUp({navigation}) {
         uid: result.user.uid,
         status: 'online',
       });
-      console.log('yup');
+
       const formdata = new FormData();
       formdata.append('name', name);
       formdata.append('firebase_email', myemail);
