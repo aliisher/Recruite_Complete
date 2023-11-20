@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1025160021202",
+    "project_id": "rightapp-5143d",
+    "storage_bucket": "rightapp-5143d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1025160021202:android:32ea4dff4df364abd2590b",
+        "android_client_info": {
+          "package_name": "com.rightapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1025160021202-of2iv6gk6470h5f845r2olf70f1o5lmm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI4StO6taD7SmmxertZw3LVS8Tq3HnwAw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1025160021202-of2iv6gk6470h5f845r2olf70f1o5lmm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1025160021202-td4oub5eevqqnatatkpoapbit103ssp9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.RightApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
