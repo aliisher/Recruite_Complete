@@ -23,10 +23,10 @@ import Toast from 'react-native-simple-toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import URL from '../tools/URL';
 // import {} from '@react-navigation/native';
-import {useIsDrawerOpen} from '@react-navigation/drawer';
+import {useDrawerStatus} from '@react-navigation/drawer';
 export default function SideBar(props) {
   const [data, setdata] = useState('');
-  const isDrawerOpen = useIsDrawerOpen();
+  const isDrawerOpen = useDrawerStatus();
   useFocusEffect(
     useCallback(() => {
       getProfile();

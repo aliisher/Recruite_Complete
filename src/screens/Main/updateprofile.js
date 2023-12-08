@@ -738,7 +738,7 @@ export default function UpdateProfile({route, navigation}) {
           <View></View>
         )}
 
-        <View style={{marginHorizontal: wp(7)}}>
+        <View>
           <Myinput
             title={'College/University (optional)'}
             titleStyles={Style.txt}

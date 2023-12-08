@@ -44,7 +44,6 @@ export default function EditProfile({navigation}) {
     axios
       .get('https://countriesnow.space/api/v0.1/countries/currency')
       .then(res => {
-        console.log('Success Reponse', res);
         setallCountries(res.data.data);
         countryArr = res.data.data.map((item, index) => {
           return {name: item.name, id: index};
@@ -65,7 +64,6 @@ export default function EditProfile({navigation}) {
       },
     })
       .then(res => {
-        console.log('Cities Success Reponse', res);
         setCityArr(
           res.data.data
             .map((item, index) => {
@@ -794,7 +792,9 @@ export default function EditProfile({navigation}) {
           <TouchableOpacity
             style={{alignSelf: 'flex-end', marginTop: wp(-3)}}
             onPress={() => setedu(true)}>
-            <Text style={{color: colors.blue}}>Add Additional Info.</Text>
+            <Text style={{color: colors.blue, paddingRight: hp(1)}}>
+              Add Additional Info.
+            </Text>
             {/* <Image  source={require('../asset/add.png')} /> */}
           </TouchableOpacity>
         )}

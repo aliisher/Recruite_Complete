@@ -9,6 +9,7 @@ export default function TermsCondition() {
         source={{
           uri: 'https://recruitme.pk/term-condition',
         }}
+        // allowsBackForwardNavigationGestures
       />
     </SafeAreaView>
   );

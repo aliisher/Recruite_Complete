@@ -435,8 +435,10 @@ function Employer({navigation}) {
 function Drawer(params) {
   // console.log('drawer k params e dekh lo', initialScreen === 'Splash');
   return initialScreen == 'Splash' ? (
-    <drawerStack.Navigator backBehavior='history' drawerContent={props => <SideBar {...props} />}>
-      {console.log('yeh chala home wala stack')}
+    <drawerStack.Navigator
+      backBehavior="history"
+      screenOptions={{headerShown: false}}
+      drawerContent={props => <SideBar {...props} />}>
       <drawerStack.Screen name="home" component={Home} />
       <drawerStack.Screen name="Employee" component={Employee} />
       <drawerStack.Screen name="Employer" component={Employer} />
@@ -446,8 +448,9 @@ function Drawer(params) {
       <EmployerStack.Screen name="Msg" component={Msg} />
     </drawerStack.Navigator>
   ) : (
-    <drawerStack.Navigator backBehavior='history' drawerContent={props => <SideBar {...props} />}>
-      {console.log('yeh chala Inbox ;;;;====== wala stack')}
+    <drawerStack.Navigator
+      backBehavior="history"
+      drawerContent={props => <SideBar {...props} />}>
       <drawerStack.Screen name="Inbox">
         {props => <Inbox {...props} from={'Inbox'} />}
       </drawerStack.Screen>
@@ -484,7 +487,7 @@ export default function Navigator() {
           initialScreen = 'Inbox';
         }
         setLoading(false);
-        // console.log('initnal Route name', initialScreen);
+        console.log('initnal Route name', initialScreen);
       });
   }, []);
 
@@ -493,8 +496,11 @@ export default function Navigator() {
   }
   return (
     <NavigationContainer ref={navigationRef}>
-      {/* {console.log('initnal Route name', initialRoute)} */}
-      <Stack.Navigator initialRouteName={initialScreen}>
+      {console.log('first', initialScreen)}
+      <Stack.Navigator
+        initialRouteName={initialScreen}
+        // screenOptions={{headerShown: false}}
+      >
         <Stack.Screen
           name="Splash"
           component={Splash}

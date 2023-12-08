@@ -48,11 +48,10 @@ export default function Home({navigation}) {
       },
     };
 
-    axios
+    await axios
       .get(URL + '/profile', config)
       .then(async res => {
         setname(res.data.successData.user);
-
         if (res.data.successData.user.profession == null) {
           navigation.navigate('Employee', {
             screen: 'EditProfile',

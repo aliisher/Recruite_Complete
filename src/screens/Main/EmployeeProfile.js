@@ -76,8 +76,7 @@ export default function EmployeeProfile({route, navigation}) {
     const config = {
       headers: {
         Authorization: 'Bearer '.concat(AuthToken),
-        'Content-Type':
-          'multipart/form-data; boundary=6ff46e0b6b5148d984f148b6542e5a5d',
+        'Content-Type': 'multipart/form-data',
       },
     };
 
@@ -118,11 +117,11 @@ export default function EmployeeProfile({route, navigation}) {
       .catch(error => {
         // setloader(false)
 
-        console.error('Eror Message', JSON.parse(JSON.stringify(error)));
+        console.log('Eror Message', JSON.parse(JSON.stringify(error)));
         setlogeduser(false);
       });
   };
-
+  console.log('@data', data);
   const moveTomsg = async () => {
     const LogedinUser = JSON.parse(await AsyncStorage.getItem('User'));
     if (route.params.blocked != true) {
@@ -338,6 +337,7 @@ export default function EmployeeProfile({route, navigation}) {
               <Text style={Style.rowtxt2}>Current Salary</Text>
             </View>
           </View> */}
+
           <View
             style={{
               flexDirection: 'row',

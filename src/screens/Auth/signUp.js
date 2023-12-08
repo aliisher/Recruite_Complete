@@ -48,7 +48,7 @@ export default function SignUp({navigation}) {
   const [name, setname] = useState('ali');
   const [Password, setPassword] = useState('');
   const [phone, setphone] = useState('');
-  const [email, setemail] = useState('ali@gmail.com');
+  const [email, setemail] = useState('alisher@gmail.com');
   const [loader, setloader] = useState(false);
   const [Terms, setTerms] = useState(false);
   const [FBToken, setFirebaseToken] = useState();
@@ -99,7 +99,7 @@ export default function SignUp({navigation}) {
     });
   }, []);
   const openRecaptcha = () => {
-    recaptcha.current.open();
+    recaptcha?.current?.open();
   };
 
   const onVerify = token => {
@@ -122,12 +122,12 @@ export default function SignUp({navigation}) {
         myemail,
         mypassword,
       );
-      firestore().collection('users').doc(result.user.uid).set({
+
+      await firestore().collection('users').doc(result.user.uid).set({
         email: email,
         uid: result.user.uid,
         status: 'online',
       });
-
       const formdata = new FormData();
       formdata.append('name', name);
       formdata.append('firebase_email', myemail);
@@ -135,7 +135,7 @@ export default function SignUp({navigation}) {
       formdata.append('notification_token', FBToken);
       formdata.append('password', mypassword);
       formdata.append('uid', result.user.uid);
-      console.log('@formdata', formdata);
+
       axios
         .post(URL + '/user-register', formdata, {
           headers: {
@@ -144,7 +144,6 @@ export default function SignUp({navigation}) {
           },
         })
         .then(async response => {
-          console.log('@response', response?.data);
           if (response.data.status == 200) {
             await AsyncStorage.setItem(
               'AuthToken',
@@ -165,19 +164,20 @@ export default function SignUp({navigation}) {
             //    navigation.navigate('Login');
           } else {
             console.log('else error');
-            Toast.show(response.data.message);
+            // Toast.show(response.data.message);
           }
         })
         .catch(error => {
           console.log('@catch error', error);
-          // Toast.show(error?.response);
+          Toast.show(error?.response);
 
           setloader(false);
         });
 
       //  alert('Successfully Registered')
     } catch (err) {
-      Alert.alert(err);
+      // Alert.alert(err);
+      Toast.show(err.response.data.message);
       setloader(false);
       // alert('some thing wrong')
     }
@@ -194,8 +194,8 @@ export default function SignUp({navigation}) {
     } else if (!emailRegex.test(email)) {
       Toast.show('Please Enter Valid Email');
     } else {
-      // openRecaptcha();
-      APICall();
+      openRecaptcha();
+      // APICall();
     }
   };
 

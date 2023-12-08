@@ -12,6 +12,8 @@ export default function Splash({navigation}) {
     const otp = JSON.parse(await AsyncStorage.getItem('OTP'));
     setTimeout(() => {
       if (Auth != null && otp == true) {
+        console.log('Auth', Auth);
+        console.log('Otp', otp);
         navigation.replace('Drawer', {
           code: 10,
           name: Auth.name,

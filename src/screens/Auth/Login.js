@@ -110,15 +110,20 @@ export default function Login({navigation}) {
   };
   const APICall = async () => {
     Keyboard.dismiss();
-    // setloader(true);
+    setloader(true);
     const formdata = new FormData();
     formdata.append('email', email);
     formdata.append('notification_token', FBToken);
     console.log('form data chala', formdata);
     axios
-      .post(URL + '/user-login', formdata)
+      .post(URL + '/user-login', formdata, {
+        headers: {
+          Accept: 'application/json', // Adjust the content type based on your API requirements
+          'Content-Type': 'multipart/form-data',
+        },
+      })
       .then(async response => {
-        console.log('user-login response', response);
+        console.log('user-login response', response?.data);
         await AsyncStorage.setItem(
           'AuthToken',
           response.data.successData.user.accessToken,
