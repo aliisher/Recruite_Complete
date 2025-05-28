@@ -77,7 +77,10 @@ export default function Filter({navigation}) {
 
     axios
       .get(URL + '/professions?search=' + profession, {
-        headers: {Authorization: 'Bearer '.concat(AuthToken)},
+        headers: {
+          Authorization: 'Bearer '.concat(AuthToken),
+          'Content-Type': 'application/json',
+        },
       })
       .then(response => {
         if (response.data.successData.professions.length != 0) {
@@ -97,8 +100,7 @@ export default function Filter({navigation}) {
     const config = {
       headers: {
         Authorization: 'Bearer '.concat(AuthToken),
-        'Content-Type':
-          'multipart/form-data; boundary=6ff46e0b6b5148d984f148b6542e5a5d',
+        'Content-Type': 'multipart/form-data',
       },
     };
     axios
@@ -134,7 +136,10 @@ export default function Filter({navigation}) {
 
     axios
       .get(URL + '/skills?search=' + skills, {
-        headers: {Authorization: 'Bearer '.concat(AuthToken)},
+        headers: {
+          Authorization: 'Bearer '.concat(AuthToken),
+          'Content-Type': 'application/json',
+        },
       })
       .then(response => {
         response.data.successData.map(item => {
@@ -157,21 +162,22 @@ export default function Filter({navigation}) {
     formdata.append('age', age);
     formdata.append('experience', Experience);
     formdata.append('salary', Salary);
-    if (showskillsarr.length == 0) {
-      formdata.append('skills', '');
-    } else {
-      formdata.append('skills', JSON.stringify(showskillsarr));
-    }
+    formdata.append(
+      'skills',
+      showskillsarr.length === 0 ? '' : JSON.stringify(showskillsarr),
+    );
     formdata.append('location', Location);
     formdata.append('availability', availability);
 
     if (Newpro != '') {
       axios
         .post(URL + '/search-profiles', formdata, {
-          headers: {Authorization: 'Bearer '.concat(AuthToken)},
+          headers: {
+            Authorization: `Bearer ${AuthToken}`,
+            'Content-Type': 'multipart/form-data', // ✅ Correct place
+          },
         })
         .then(response => {
-          let newuserarr = [];
           console.log('search Response', response.data.successData);
           setusers(response.data.successData);
 
@@ -180,11 +186,21 @@ export default function Filter({navigation}) {
             skills: valueMS,
           });
         })
-        .catch(error => {});
+        .catch(error => {
+          if (error.response) {
+            console.log('❌ Error Response:', error.response.data);
+            console.log('Status:', error.response.status);
+          } else if (error.request) {
+            console.log('❌ No Response received:', error.request);
+          } else {
+            console.log('❌ Error Message:', error.message);
+          }
+        });
     } else {
       Alert.alert('Profession is required');
     }
   };
+
   const addProfessionSkills = async (name, type) => {
     const AuthToken = await AsyncStorage.getItem('AuthToken');
 

@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Image,
   FlatList,
+  Platform,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -34,6 +35,7 @@ const AllEmployees = ({navigation}) => {
   const [page, setpage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [myUser, setMyUser] = useState();
+  const [totalUsers, setTotalUsers] = useState(0);
 
   // useFocusEffect(
   //   useCallback(() => {
@@ -60,7 +62,7 @@ const AllEmployees = ({navigation}) => {
     if (page == 1) {
       getalluser();
     }
-  }, []);
+  }, [allusers]);
 
   const getalluser = async () => {
     if (!loading && page <= Lastpage) {
@@ -68,11 +70,14 @@ const AllEmployees = ({navigation}) => {
       const AuthToken = await AsyncStorage.getItem('AuthToken');
       axios
         .get(URL + `/profiles?page=${page}`, {
-          headers: {Authorization: 'Bearer '.concat(AuthToken)},
+          headers: {
+            Authorization: 'Bearer '.concat(AuthToken),
+            'Content-Type': 'application/json',
+          },
         })
         .then(response => {
-          console.log('all user get response', response);
           setLastpage(response.data.successData.last_page);
+          setTotalUsers(response.data.successData.total);
           setallusers(state => [...state, ...response.data.successData.users]);
           setpage(page + 1);
           setLoading(false);
@@ -86,12 +91,10 @@ const AllEmployees = ({navigation}) => {
 
   const getUserData = async () => {
     const user = JSON.parse(await AsyncStorage.getItem('User'));
-    console.log('MyuserData is ', user);
     setMyUser(user);
   };
 
   const NavigateToChat = clicked => {
-    console.log('this si clickedddddd...', clicked);
     const checkReceivers = clicked.receivers.find(
       item =>
         item.sender_id == JSON.stringify(myUser.id) &&
@@ -102,8 +105,7 @@ const AllEmployees = ({navigation}) => {
         item.receiver_id == JSON.stringify(myUser.id) &&
         item.sender_block == 'true',
     );
-    console.log('this is check recievers', checkReceivers);
-    console.log('this is check senders', checkSenders);
+
     if (
       checkReceivers != undefined &&
       checkReceivers.receiver_block == 'true'
@@ -198,191 +200,196 @@ const AllEmployees = ({navigation}) => {
         </TouchableOpacity>
       </View>
       <View style={{flex: 1}}>
-        {allusers.length > 0 ? (
-          <FlatList
-            data={allusers}
-            showsVerticalScrollIndicator={false}
-            // renderItem={(item)=>renderCard(item)}
-            // initialNumToRender = {10}
-            onEndReachedThreshold={0.5}
-            onMomentumScrollBegin={() => {
-              onEndReachedCalledDuringMomentum = false;
-            }}
-            onEndReached={() => {
-              if (!onEndReachedCalledDuringMomentum) {
-                getalluser(); // LOAD MORE DATA
-                onEndReachedCalledDuringMomentum = true;
-              }
-            }}
-            renderItem={({item}) => (
-              <TouchableOpacity key={item.id}>
-                <View style={Style.opcbtn}>
-                  <TouchableOpacity
-                    // style={{backgroundColor:'pink',width:"70%"}}
-                    onPress={async () => {
-                      console.log('profilepress par item ', item);
-                      await AsyncStorage.setItem('filter', 'true');
-                      await AsyncStorage.setItem(
-                        'user_id',
-                        JSON.stringify(item.id),
-                      );
-
-                      const checkReceivers = item.receivers.find(
-                        item =>
-                          item.sender_id == JSON.stringify(myUser.id) &&
-                          item.receiver_block == 'true',
-                      );
-                      const checkSenders = item.senders.find(
-                        item =>
-                          item.receiver_id == JSON.stringify(myUser.id) &&
-                          item.sender_block == 'true',
-                      );
-                      console.log('this is check recievers', checkReceivers);
-                      console.log('this is check senders', checkSenders);
-                      if (
-                        checkReceivers != undefined &&
-                        checkReceivers.receiver_block == 'true'
-                      ) {
-                        navigation.navigate('EmployeeProfile', {
-                          userInfo: item,
-                          filter: true,
-                          blocked: true,
-                        });
-                      } else if (
-                        checkSenders != undefined &&
-                        checkSenders.sender_block == 'true'
-                      ) {
-                        navigation.navigate('EmployeeProfile', {
-                          userInfo: item,
-                          filter: true,
-                          blocked: true,
-                        });
-                      } else {
-                        navigation.navigate('EmployeeProfile', {
-                          userInfo: item,
-                          filter: true,
-                          blocked: false,
-                        });
-                      }
-                      // navigation.navigate('EmployeeProfile', {
-                      //   userInfo: item,
-                      //   filter: true,
-                      // });
-                    }}>
-                    <View style={{flexDirection: 'row', marginBottom: 20}}>
-                      {item.image != null ? (
-                        <Image
-                          size={100}
-                          source={{uri: item.image}}
-                          style={{height: 50, borderRadius: 30, width: 50}}
-                        />
-                      ) : (
-                        <Image
-                          size={100}
-                          source={require('../../assets/mypic.jpeg')}
-                          style={{height: 50, borderRadius: 30, width: 50}}
-                        />
-                      )}
-                      {/* <Image size={100} source={{uri:item.image}} style={{height:50,borderRadius:30 ,width:50}}  /> */}
-                      <View style={{padding: 5, width: '70%', marginLeft: 10}}>
-                        <Text style={Style.usertxt}>{item.name}</Text>
-                        <Text style={{fontSize: 12, width: '100%'}}>
-                          {item.profession}
-                        </Text>
-                        <Text style={{fontSize: 12}}>
-                          {item.designation != null
-                            ? item.designation
-                            : 'Fresh'}
-                        </Text>
-                        <Text
-                          style={{
-                            fontFamily: 'Raleway-SemiBold',
-                            color: colors.blue,
-                            fontSize: 16,
-                          }}>
-                          Exp:{' '}
-                          {item.symbol == '' || item.symbol == null
-                            ? 'PKR'
-                            : item.symbol}{' '}
-                          {item.expected_salary}
-                        </Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                  <View style={{flexDirection: 'row'}}>
+        {allusers?.length > 0 ? (
+          <>
+            <View style={Style.totalUsersContainer}>
+              <Text style={Style.totalUsersText}>
+                Total Employees: {totalUsers}
+              </Text>
+            </View>
+            <FlatList
+              data={allusers}
+              showsVerticalScrollIndicator={false}
+              // renderItem={(item)=>renderCard(item)}
+              // initialNumToRender = {10}
+              onEndReachedThreshold={0.5}
+              onMomentumScrollBegin={() => {
+                onEndReachedCalledDuringMomentum = false;
+              }}
+              onEndReached={() => {
+                if (!onEndReachedCalledDuringMomentum) {
+                  getalluser(); // LOAD MORE DATA
+                  onEndReachedCalledDuringMomentum = true;
+                }
+              }}
+              renderItem={({item}) => (
+                <TouchableOpacity key={item.id}>
+                  <View style={Style.opcbtn}>
                     <TouchableOpacity
-                      onPress={() => {
-                        NavigateToChat(item);
-                      }}>
-                      <Image
-                        source={require('../asset/msg.png')}
-                        style={{
-                          height: 28,
-                          borderRadius: 30,
-                          top: 6,
-                          width: 28,
-                        }}
-                      />
-                    </TouchableOpacity>
-
-                    {/* <Image source={require('../asset/msg.png')} 
-                  style={{height:30,borderRadius:30,top:7 ,width:30}} /> */}
-                    <TouchableOpacity
-                      onPress={() => {
-                        //  setname(item.name);
-
-                        Share.share(
-                          {
-                            title: 'Recruit Me',
-                            message: `Here ${
-                              item.name
-                            } is an Employee at Recruitme app. Install the application to see and contact with more employees to find the perfect employee ${'https://play.google.com/store/apps/details?id=com.rightapp'} `, // Note that according to the documentation at least one of "message" or "url" fields is required
-                            url: 'https://www.whatsapp.com/',
-                            subject:
-                              'You can find and IT Skils developers using this app',
-                          },
-                          {
-                            // Android only:
-                            dialogTitle: 'Share your profile',
-                            // iOS only:
-                            excludedActivityTypes: [
-                              'com.apple.UIKit.activity.PostToTwitter',
-                            ],
-                          },
+                      // style={{backgroundColor:'pink',width:"70%"}}
+                      onPress={async () => {
+                        await AsyncStorage.setItem('filter', 'true');
+                        await AsyncStorage.setItem(
+                          'user_id',
+                          JSON.stringify(item.id),
                         );
-                      }}>
-                      <Image
-                        source={require('../../assets/share.png')}
-                        style={{
-                          width: 20,
-                          height: 20,
-                          marginRight: 5,
-                          top: 10,
-                          left: 5,
-                        }}
-                      />
-                    </TouchableOpacity>
-                    {/* <Icon size={12} name="navigation"  color={colors.blue} reverse={true} type="meterial-community"  style={{transform: [{rotate: '0deg'}]}} /> */}
-                  </View>
 
-                  {/* <TouchableOpacity  onPress={()=>navigation.navigate('Msg',{ myuser:logeduser,uid:item.uid,name:item.name })}>
-         
-                 <Image source={require('../asset/msg.png')} 
-                  style={{height:45,borderRadius:30 ,width:45}} />
-                  </TouchableOpacity> */}
-                </View>
-                <View style={{position: 'absolute', right: 10, top: '50%'}}>
-                  {item.availability == 'unavailable' ? (
-                    <Text style={Style.rowtxt}>N/A</Text>
-                  ) : (
-                    <Text style={Style.rowtxt}></Text>
-                  )}
-                  {/* <Text style={Style.rowtxt2}>Availability</Text> */}
-                </View>
-              </TouchableOpacity>
-            )}
-            keyExtractor={item => item.id}
-          />
+                        const checkReceivers = item.receivers.find(
+                          item =>
+                            item.sender_id == JSON.stringify(myUser.id) &&
+                            item.receiver_block == 'true',
+                        );
+                        const checkSenders = item.senders.find(
+                          item =>
+                            item.receiver_id == JSON.stringify(myUser.id) &&
+                            item.sender_block == 'true',
+                        );
+                        if (
+                          checkReceivers != undefined &&
+                          checkReceivers.receiver_block == 'true'
+                        ) {
+                          navigation.navigate('EmployeeProfile', {
+                            userInfo: item,
+                            filter: true,
+                            blocked: true,
+                          });
+                        } else if (
+                          checkSenders != undefined &&
+                          checkSenders.sender_block == 'true'
+                        ) {
+                          navigation.navigate('EmployeeProfile', {
+                            userInfo: item,
+                            filter: true,
+                            blocked: true,
+                          });
+                        } else {
+                          navigation.navigate('EmployeeProfile', {
+                            userInfo: item,
+                            filter: true,
+                            blocked: false,
+                          });
+                        }
+                        // navigation.navigate('EmployeeProfile', {
+                        //   userInfo: item,
+                        //   filter: true,
+                        // });
+                      }}>
+                      <View style={{flexDirection: 'row', marginBottom: 20}}>
+                        {item.image != null ? (
+                          <Image
+                            size={100}
+                            source={{uri: item.image}}
+                            style={{height: 50, borderRadius: 30, width: 50}}
+                          />
+                        ) : (
+                          <Image
+                            size={100}
+                            source={require('../../assets/mypic.jpeg')}
+                            style={{height: 50, borderRadius: 30, width: 50}}
+                          />
+                        )}
+                        {/* <Image size={100} source={{uri:item.image}} style={{height:50,borderRadius:30 ,width:50}}  /> */}
+                        <View
+                          style={{padding: 5, width: '70%', marginLeft: 10}}>
+                          <Text style={Style.usertxt}>{item.name}</Text>
+                          <Text style={{fontSize: 12, width: '100%'}}>
+                            {item.profession}
+                          </Text>
+                          <Text style={{fontSize: 12}}>
+                            {item.designation != null
+                              ? item.designation
+                              : 'Fresh'}
+                          </Text>
+                          <Text
+                            style={{
+                              fontFamily: 'Raleway-SemiBold',
+                              color: colors.blue,
+                              fontSize: 16,
+                            }}>
+                            Exp:{' '}
+                            {item.symbol == '' || item.symbol == null
+                              ? 'PKR'
+                              : item.symbol}{' '}
+                            {item.expected_salary}
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                    <View style={{flexDirection: 'row'}}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          NavigateToChat(item);
+                        }}>
+                        <Image
+                          source={require('../asset/msg.png')}
+                          style={{
+                            height: 28,
+                            borderRadius: 30,
+                            top: 6,
+                            width: 28,
+                          }}
+                        />
+                      </TouchableOpacity>
+
+                      {/* <Image source={require('../asset/msg.png')} 
+                    style={{height:30,borderRadius:30,top:7 ,width:30}} /> */}
+                      <TouchableOpacity
+                        onPress={() => {
+                          //  setname(item.name);
+
+                          Share.share(
+                            {
+                              title: 'Recruit Me',
+                              message: `Here ${
+                                item.name
+                              } is an Employee at Recruitme app. Install the application to see and contact with more employees to find the perfect employee ${'https://play.google.com/store/apps/details?id=com.rightapp'} `, // Note that according to the documentation at least one of "message" or "url" fields is required
+                              url: 'https://www.whatsapp.com/',
+                              subject:
+                                'You can find and IT Skils developers using this app',
+                            },
+                            {
+                              // Android only:
+                              dialogTitle: 'Share your profile',
+                              // iOS only:
+                              excludedActivityTypes: [
+                                'com.apple.UIKit.activity.PostToTwitter',
+                              ],
+                            },
+                          );
+                        }}>
+                        <Image
+                          source={require('../../assets/share.png')}
+                          style={{
+                            width: 20,
+                            height: 20,
+                            marginRight: 5,
+                            top: 10,
+                            left: 5,
+                          }}
+                        />
+                      </TouchableOpacity>
+                      {/* <Icon size={12} name="navigation"  color={colors.blue} reverse={true} type="meterial-community"  style={{transform: [{rotate: '0deg'}]}} /> */}
+                    </View>
+
+                    {/* <TouchableOpacity  onPress={()=>navigation.navigate('Msg',{ myuser:logeduser,uid:item.uid,name:item.name })}>
+           
+                   <Image source={require('../asset/msg.png')} 
+                    style={{height:45,borderRadius:30 ,width:45}} />
+                    </TouchableOpacity> */}
+                  </View>
+                  <View style={{position: 'absolute', right: 10, top: '50%'}}>
+                    {item.availability == 'unavailable' ? (
+                      <Text style={Style.rowtxt}>N/A</Text>
+                    ) : (
+                      <Text style={Style.rowtxt}></Text>
+                    )}
+                    {/* <Text style={Style.rowtxt2}>Availability</Text> */}
+                  </View>
+                </TouchableOpacity>
+              )}
+              keyExtractor={item => item.id}
+            />
+          </>
         ) : (
           <Text style={{alignSelf: 'center', top: '30%', color: 'grey'}}>
             No Profiles Created Yet!
@@ -445,10 +452,16 @@ const Style = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: colors.blue,
   },
-  usertxt: {
-    fontFamily: 'Raleway-SemiBold',
+  totalUsersContainer: {
+    padding: 15,
+    backgroundColor: '#f5f5f5',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  totalUsersText: {
+    fontSize: 16,
     color: colors.blue,
-    fontSize: 18,
+    fontFamily: 'Raleway-SemiBold',
   },
 });
 

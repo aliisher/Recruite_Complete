@@ -121,7 +121,6 @@ export default function EmployeeProfile({route, navigation}) {
         setlogeduser(false);
       });
   };
-  console.log('@data', data);
   const moveTomsg = async () => {
     const LogedinUser = JSON.parse(await AsyncStorage.getItem('User'));
     if (route.params.blocked != true) {
