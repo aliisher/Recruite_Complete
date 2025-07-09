@@ -4,6 +4,7 @@ import Navigator from './src/navigatioin';
 import NotificationController from './NotificationController.android';
 
 export default function AwesomeProject() {
+  console.log('object')
   return (
     <>
       <Navigator />
